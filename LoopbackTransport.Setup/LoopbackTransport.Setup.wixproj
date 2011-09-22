@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\solvIT.BaseLibrary.Build\solvIT.BaseLibrary.Build.Targets" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.5</ProductVersion>
+    <ProjectGuid>{380a95a9-61a0-4644-b06f-8fcbad11aae3}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>LoopbackTransportSetup</OutputName>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <PathToSourceFile>..\ignore\commonassemblyinfo.cs</PathToSourceFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug;FileVersion=$(FileVersion);ProductVersion=$(ProductVersion)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug;FileVersion=$(FileVersion);ProductVersion=$(ProductVersion)</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LoopbackTransportInstallerV2\LoopbackTransportInstallerV2.csproj">
+      <Name>LoopbackTransportInstallerV2</Name>
+      <Project>{1b9a31af-a18e-4054-b8c1-a47ae31c8d00}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\LoopbackTransportInstallerV4\LoopbackTransportInstallerV4.csproj">
+      <Name>LoopbackTransportInstallerV4</Name>
+      <Project>{0036e1a6-b665-462c-8604-e203e75d23a0}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\LoopbackTransport\LoopbackTransport.csproj">
+      <Name>LoopbackTransport</Name>
+      <Project>{3d923237-1efb-41b3-824d-5cda1e35f89f}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLLOCATION</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.-->
+  <Target Name="BeforeBuild">
+    <ReadVersionAttributes PathToSourceFile="$(PathToSourceFile)">
+      <Output TaskParameter="Version" PropertyName="Version" />
+      <Output TaskParameter="FileVersion" PropertyName="FileVersion" />
+      <Output TaskParameter="ProductVersion" PropertyName="ProductVersion" />
+    </ReadVersionAttributes>
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstant);FileVersion=$(FileVersion);ProductVersion=$(ProductVersion)</DefineConstants>
+    </PropertyGroup>
+    <Message Text="Version: $(Version)" Importance="high" />
+    <Message Text="FileVersion: $(FileVersion)" Importance="high" />
+    <Message Text="ProductVersion: $(ProductVersion)" Importance="high" />
+  </Target>
+  <!--
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

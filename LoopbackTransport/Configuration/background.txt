@@ -1,0 +1,43 @@
+﻿http://blogs.msdn.com/b/markgabarra/archive/2006/05/26/608328.aspx
+
+Why create an additional extension mechanism for the WCF configuration portion?  
+
+Simply put, the System.Configuration extension points did not cover this particular scenario.  
+System.Configuration allows developers to plug in custom ConfigurationSectionGroup and ConfigurationSection objects. 
+ConfigurationSectionGroups can only contain ConfigurationSection objects and cannot include any attributes or configuration data.  
+In other words, section groups exist to define hierarchy and scope only.  
+ConfigurationSections, on the other hand, can contain attributes as well as child nodes of type ConfigurationElement and/or ConfigurationElementCollection.  They cannot, however, contain other ConfigurationSections.  
+The WCF configuration system required the ability to plug in custom ConfigurationElement objects.
+
+Because we cannot simply take a element name (“customTransport” in the previous case) and “auto magically” determine how to deserialize the associated XML, we created a registration point that allows developers to register a ConfigurationElement object that knows how to deserialize the given XML with an element name. 
+
+--------------------------------------
+
+Servicemodel has extensions in configuration: bindingelementextensions, bindingextensions, behaviorextensions and endpointextensions
+
+These are collections of type ServiceModel.Configuration.ExtensionElementCollection with entries of type ServiceModel.Configuration.ExtensionElement : System.Configuration.ExtensionElement
+
+---------------------------------------------
+
+Every System.Configuration.ExtensionElement has a Name + Type
+
+System.ServiceModel.Configuration.BinaryMessageEncodingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+
+This class is a subtype of the abstract BindingElementExtensionElement (not related to the above ExtensionElement)
+
+The Type property corresponds to the type that knows how to deserialized the configuration XML for this binding.
+
+System.ServiceModel.Configuration.BinaryMessageEncodingElement :
+abstract System.ServiceModel.Configuration.BindingElementExtensionElement :
+System.ServiceModel.Configuration.ServiceModelExtensionElement :
+System.Configuration.ConfigurationElement
+
+This BinaryMessageEncodingElement is in fact a strongly typed configuration class with specific properties.
+This BindingElementExtensionElement abstract class has a property 'Type' (BindingElementType).
+That Type is the runtime type for the channel-stack and as a consequence inside the Channels namespace 
+
+System.ServiceModel.Channels.BinaryMessageEncodingBindingElement
+
+For loopback this is a subtype of TransportBindingElement in the Channels namespace.
+
+

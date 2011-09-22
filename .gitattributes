@@ -1,0 +1,2 @@
+[attr]utf16 set merge diff -crlf
+*.xsd utf16

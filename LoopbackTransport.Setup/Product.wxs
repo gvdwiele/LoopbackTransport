@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="LoopbackTransport" Language="1033" Version="$(var.FileVersion)" Manufacturer="solvIT" UpgradeCode="D18AD399-1AF2-44EA-8C83-B5874EFD505E">
+
+        <Package Comments="This installer contains the loopback transport channel for WCF."  Compressed="yes" Description="LoopbackTransport $(var.ProductVersion)" InstallerVersion="200" Languages="1033" Manufacturer="solvIT" Platform="x86" />
+
+        <CustomAction Id="InstallLoopbackV2" BinaryKey="LoopbackTransportInstallerV2" DllEntry="RegisterLoopbackTransport" Execute="immediate"  Return="check" />
+        <CustomAction Id="UninstallLoopbackV2" BinaryKey="LoopbackTransportInstallerV2" DllEntry="UnregisterLoopbackTransport" Execute="immediate"  Return="check" />
+        <Binary Id="LoopbackTransportInstallerV2" SourceFile="$(var.LoopbackTransportInstallerV2.TargetDir)\LoopbackTransportInstallerV2.CA.dll" />
+
+        <CustomAction Id="InstallLoopbackV4" BinaryKey="LoopbackTransportInstallerV4" DllEntry="RegisterLoopbackTransport" Execute="immediate"  Return="check" />
+        <CustomAction Id="UninstallLoopbackV4" BinaryKey="LoopbackTransportInstallerV4" DllEntry="UnregisterLoopbackTransport" Execute="immediate"  Return="check" />
+        <Binary Id="LoopbackTransportInstallerV4" SourceFile="$(var.LoopbackTransportInstallerV4.TargetDir)\LoopbackTransportInstallerV4.CA.dll" />
+
+        <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+        <Upgrade Id="D18AD399-1AF2-44EA-8C83-B5874EFD505E">
+            <!--http://wix.sourceforge.net/manual-wix2/wix_xsd_upgradeversion.htm-->
+            <UpgradeVersion Minimum="$(var.FileVersion)" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
+            <UpgradeVersion Minimum="1.0.0.0" IncludeMinimum="yes" Maximum="$(var.FileVersion)" IncludeMaximum="yes" Property="OLDERVERSIONBEINGUPGRADED"/>
+            <!--for prod builds set IncludeMax to 'no'-->
+            <!--<UpgradeVersion Minimum="1.0.0" IncludeMinimum="yes" Maximum="$(var.ProductVersion)" IncludeMaximum="no" Property="OLDERVERSIONBEINGUPGRADED"/>-->
+        </Upgrade>
+
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+        <Icon Id="Solvit.ico" SourceFile="resources\solvit.ico" />
+        <Property Id="ARPPRODUCTICON" Value="Solvit.ico" />
+        <Property Id="ARPHELPLINK" Value="http://www.eai.be" />
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="GAC" Name="GAC">
+                    <Component Id="GAC.LoopbackTransport" Guid="{43300032-73ED-4840-9C6A-0FE9E52A6421}">
+                        <File Id="GAC.LoopbackTransport.dll" Name="$(var.LoopbackTransport.TargetFileName)" KeyPath="yes" DiskId="1" Source="$(var.LoopbackTransport.TargetPath)"   Assembly=".net" />
+                    </Component>
+                </Directory>
+                <Directory Id="INSTALLLOCATION" Name="eTerminal Notifications" >
+                    <Component Id="LoopbackTransport" Guid="{B99D2754-117B-4C8C-8917-42033F1D87EE}">
+                        <File Id="LoopbackTransport.dll" Name="$(var.LoopbackTransport.TargetFileName)" KeyPath="yes" DiskId="1" Source="$(var.LoopbackTransport.TargetPath)" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <Feature Id="ProductFeature" Level="1" Title="LoopbackTransport binaries">
+            <ComponentRef Id="LoopbackTransport" />
+            <ComponentRef Id="GAC.LoopbackTransport" />
+        </Feature>
+
+        <InstallExecuteSequence>
+            <RemoveExistingProducts After="InstallInitialize"/>
+            <Custom Action="InstallLoopbackV2" After="InstallFiles">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
+            <Custom Action="InstallLoopbackV4" After="InstallFiles">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
+            <Custom Action="UninstallLoopbackV2" Before="RemoveFiles" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="UninstallLoopbackV4" Before="RemoveFiles" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+        </InstallExecuteSequence>
+
+    </Product>
+</Wix>

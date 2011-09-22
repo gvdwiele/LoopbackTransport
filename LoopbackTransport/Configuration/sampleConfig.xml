@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.serviceModel>
+    <extensions>
+      <bindingElementExtensions>
+        <add name="loopbackTransport" type="LoopbackTransport.LoopbackTransportElement, LoopbackTransport, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2ed0007adc766c13" />
+      </bindingElementExtensions>
+    </extensions>
+    <!--Now that your config sections are registered, services or client endpoints in config can use these in their bindings-->
+    <!--You can create a customBinding in config like this to set an endpoint to use your custom binding-->
+    <!--<customBinding><binding name="myBinding"><binaryMessageEncoding><loopbackTransport/></binding></customBinding>-->
+    <!--Then you can use it in an endpoint: -->
+    <!--<endpoint name="testendpoint" binding="customBinding" bindingConfiguration="myBinding" ></endpoint>-->
+  </system.serviceModel>
+</configuration>
