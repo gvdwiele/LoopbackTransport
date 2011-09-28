@@ -42,17 +42,17 @@
             </Directory>
         </Directory>
 
-        <Feature Id="ProductFeature" Level="1" Title="LoopbackTransport binaries">
-            <ComponentRef Id="LoopbackTransport" />
+        <Feature Id="ProductFeature" Level="1" Title="LoopbackTransport binaries" >
+            <ComponentRef Id="LoopbackTransport"  />
             <ComponentRef Id="GAC.LoopbackTransport" />
         </Feature>
 
         <InstallExecuteSequence>
             <RemoveExistingProducts After="InstallInitialize"/>
-            <Custom Action="InstallLoopbackV2" After="InstallFiles">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
-            <Custom Action="InstallLoopbackV4" After="InstallFiles">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
-            <Custom Action="UninstallLoopbackV2" Before="RemoveFiles" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
-            <Custom Action="UninstallLoopbackV4" Before="RemoveFiles" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="InstallLoopbackV2" After="InstallFinalize">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
+            <Custom Action="InstallLoopbackV4" After="InstallFinalize">NOT (Installed OR PREVIOUSVERSIONSINSTALLED)</Custom>
+            <Custom Action="UninstallLoopbackV2" Before="RemoveExistingProducts" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="UninstallLoopbackV4" Before="RemoveExistingProducts" >(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
     </Product>

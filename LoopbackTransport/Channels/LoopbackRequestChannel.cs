@@ -93,7 +93,7 @@ namespace LoopbackTransport.Channels
             Trace.WriteLineIf(Tracing.LBSwitch.TraceVerbose, string.Format("LoopbackRequestChannel:OnOpen {0}", this._via.ToString()));
         }
 
-        private Message Request(Message msg)
+        public Message Request(Message msg)
         {
             base.ThrowIfDisposedOrNotOpen();
 
