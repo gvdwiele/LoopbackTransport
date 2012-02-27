@@ -1,0 +1,76 @@
+<!-- 
+  Targets to deploy EntLib 2.0 configuration into SSO applications, can be used @runtime by EntLib SSO source
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+
+  <PropertyGroup>
+    <BaseLibraryTargetsFolder Condition="'$(BaseLibraryTargetsFolder)' == ''">$(MSBuildThisFileDirectory)\</BaseLibraryTargetsFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeEntLibSSO Condition=" '$(IncludeEntLibSSO)'=='' ">false</IncludeEntLibSSO>
+    <SkipUndeploy Condition=" '$(SkipUndeploy)'=='' ">false</SkipUndeploy>
+    <SsoManageExecutable Condition=" '$(SsoManageExecutable)'==''">C:\Program Files\Common Files\Enterprise Single Sign-On\ssomanage.exe</SsoManageExecutable>
+    <ElssoDeployExecutable Condition=" '$(ElssoDeployExecutable)'=='' ">$(BaseLibraryTargetsFolder)\ELSSO\elssodeploy.exe</ElssoDeployExecutable>
+  </PropertyGroup>
+
+  <!-- SsoApplicationFilePath contains properties for creating AA in SSO -->
+  <PropertyGroup>
+    <UsingSsoApplicationMasterFilePath Condition=" '$(UsingSsoApplicationMasterFilePath)'=='' ">true</UsingSsoApplicationMasterFilePath>
+    <SsoApplicationMasterFilePath Condition=" '$(SsoApplicationMasterFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoApplicationMaster.xml</SsoApplicationMasterFilePath>
+    <SsoApplicationFilePath Condition=" '$(SsoApplicationFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoApplication.xml</SsoApplicationFilePath>
+  </PropertyGroup>
+
+  <!-- SsoConfigFilePath contains the EntLib config to be preprocessed and deployed into SSO -->
+  <PropertyGroup >
+    <UsingSsoConfigMaster Condition=" '$(UsingSsoConfigMaster)'=='' ">true</UsingSsoConfigMaster>
+    <SsoConfigMasterFilePath Condition=" '$(SsoConfigMasterFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoConfigMaster.xml</SsoConfigMasterFilePath>
+    <SsoConfigFilePath Condition=" '$(SsoConfigFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoConfig.xml</SsoConfigFilePath>
+  </PropertyGroup>
+
+  <!-- SsoConfigEditFilePath is a dummy config file that reads the AA's properties using the SSO source-->
+  <PropertyGroup >
+    <UsingSsoConfigEditMaster Condition=" '$(UsingSsoConfigEditMaster)'=='' ">true</UsingSsoConfigEditMaster>
+    <SsoConfigEditMasterFilePath Condition=" '$(SsoConfigEditMasterFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoConfigEditMaster.xml</SsoConfigEditMasterFilePath>
+    <SsoConfigEditFilePath Condition=" '$(SsoConfigEditFilePath)'=='' ">$(MSBuildProjectDirectory)\$(ProjectName).SsoConfigEdit.xml</SsoConfigEditFilePath>
+  </PropertyGroup>
+
+  <!--Preprocess SSO application: merge a master with a settings file.-->
+  <Target Name="XmlPreProcessMasterEntLibSSO" Condition=" '$(IncludeEntLibSSO)'=='true' ">
+
+    <Exec Condition=" '$(UsingSsoApplicationMasterFilePath)'=='true' and '$(SettingsFilePath)'!='' "
+      Command="&quot;$(DeployTools)\xmlpreprocess.exe&quot; /i:&quot;$(SsoApplicationMasterFilePath)&quot; /o:&quot;$(SsoApplicationFilePath)&quot; /d:CurDir=&quot;$(MSBuildProjectDirectoryParent)&quot; /d:CurProject=&quot;$(ProjectName)&quot; /s:&quot;$(SettingsFilePath)&quot; /c"
+      ContinueOnError="false"/>
+
+    <Exec Condition=" '$(UsingSsoConfigMaster)'=='true' and '$(SettingsFilePath)'!='' "
+      Command="&quot;$(DeployTools)\xmlpreprocess.exe&quot; /i:&quot;$(SsoConfigMasterFilePath)&quot; /o:&quot;$(SsoConfigFilePath)&quot; /d:CurDir=&quot;$(MSBuildProjectDirectoryParent)&quot; /d:CurProject=&quot;$(ProjectName)&quot; /s:&quot;$(SettingsFilePath)&quot; /c "
+      ContinueOnError="false"/>
+
+    <Exec Condition=" '$(UsingSsoConfigEditMaster)'=='true' and '$(SettingsFilePath)'!='' "
+      Command="&quot;$(DeployTools)\xmlpreprocess.exe&quot; /i:&quot;$(SsoConfigEditMasterFilePath)&quot; /o:&quot;$(SsoConfigEditFilePath)&quot; /d:CurDir=&quot;$(MSBuildProjectDirectoryParent)&quot; /d:CurProject=&quot;$(ProjectName)&quot; /s:&quot;$(SettingsFilePath)&quot; /c"
+      ContinueOnError="false"/>
+
+  </Target>
+
+  <!--Create EntLib SSO source affiliate apps into SSO.-->
+  <Target Name="DeployEntLibSSO" Condition=" '$(IncludeEntLibSSO)'=='true' " DependsOnTargets="XmlPreProcessMasterEntLibSSO">
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -createapps &quot;$(SsoApplicationFilePath)&quot;" ContinueOnError="false" />
+    <Exec Command="&quot;$(ElssoDeployExecutable)&quot; -c &quot;$(SsoConfigFilePath)&quot; -a $(ProjectName)" ContinueOnError="false"  />
+  </Target>
+
+  <!--Delete affiliate app and associated settings.-->
+  <Target Name="UndeployEntLibSSO" Condition=" '$(IncludeEntLibSSO)'=='true' and '$(SkipUndeploy)'!='true' " >
+    <!-- TODO: create a xml-foreach task that reads from the SsoApplication file -->
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).dataConfiguration" />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).connectionStrings" />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).loggingConfiguration" />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).instrumentationConfiguration" />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).cachingConfiguration"   />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).exceptionHandling"   />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).securityConfiguration"   />
+    <Exec Command="&quot;$(SsoManageExecutable)&quot; -deleteapp $(ProjectName).securityCryptographyConfiguration" />
+  </Target>
+
+</Project>
+
+
